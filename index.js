@@ -1,23 +1,38 @@
 const express = require("express");
-const dotenv = require("dotenv");
-const path = require("path");
-dotenv.config();
+const dotenv = require("dotenv").config();
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+const userRoute = require("./Routes/userRoute.js");
 
-const port = process.env.PORT || 4000;
-const generalRoute = require("./routes/generalRoute.js");
+const port = process.env.PORT || 4040;
 
 const app = express();
 
-// Static Files Middleware
-app.use(express.static("public"));
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Parse JSON bodies
+app.use(express.static(path.join(__dirname, "public"))); // Serve static files
 
-// Body Parser Middleware (Built into Express)
-app.use(express.urlencoded({ extended: false }));
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/UsersData')
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => {
+        console.error("Error connecting to MongoDB", err);
+        process.exit(1); // Exit process on DB connection failure
+    });
 
-// Use General Route
-app.use("/", generalRoute);
+// Routes
+app.use(userRoute);
+
+
+// Centralized Error Handling Middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({ error: "Internal Server Error" });
+});
 
 // Start Server
 app.listen(port, () => {
-    console.log("Server Running At port: " + port);
+    console.log(`Server Running At port: ${port}`);
 });
