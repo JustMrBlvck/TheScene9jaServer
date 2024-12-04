@@ -32,6 +32,28 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         select: false
+    },
+
+    // added user type
+    role: {
+        type: String,
+        enum: [
+            'Admin',
+            'Author',
+            'Reader'
+        ],
+        default: 'Reader'
+    },
+
+    // added bio
+    bio: {
+        type: String,
+        trim: true
+    },
+
+    // added profile picture
+    profilePicture: {
+        type: String
     }
 }, { timestamps: true });
 
@@ -43,4 +65,5 @@ userSchema.pre('save', async function (next) {
 });
 
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+module.exports = User;
