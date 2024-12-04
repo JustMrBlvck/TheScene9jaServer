@@ -31,7 +31,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        select: false
+        select: false,
+        minlength: 8
     },
 
     // added user type
@@ -54,7 +55,12 @@ const userSchema = new mongoose.Schema({
     // added profile picture
     profilePicture: {
         type: String
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
+
 }, { timestamps: true });
 
 // Pre-save hook to hash passwords
@@ -63,6 +69,11 @@ userSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
+
+// compare passwords
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
 
 const User = mongoose.model('User', userSchema);
