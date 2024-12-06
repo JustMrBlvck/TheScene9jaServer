@@ -4,9 +4,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const userRoute = require("./Routes/userRoute.js");
+const connectDB = require('./db.js');
 
 const port = process.env.PORT || 4040;
 
+connectDB();
 const app = express();
 
 // Middleware

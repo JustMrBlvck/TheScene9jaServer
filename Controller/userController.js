@@ -1,5 +1,6 @@
 const User = require('../Model/userModel');
 const bcrypt = require('bcrypt');
+const jwt =  require('jsonwebtoken');
 
 // Controller to handle user registration
 exports.signUp = async (req, res) => {
@@ -52,6 +53,36 @@ exports.getAllUsers = async (req, res) => {
         // Exclude sensitive fields (like password) from the result
         const users = await User.find().select('-password');
         res.status(200).send(users);
+    } catch (error) {
+        console.error(error); // Log error for debugging
+        res.status(500).send({ error: "Internal server error" });
+    }
+};
+
+// Controller to update user profile
+exports.updateUserProfile = async (req, res) => {
+    try {
+        const { firstname, lastname, bio, profilePicture } = req.body;
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            { firstname, lastname, bio, profilePicture },
+            { new: true, runValidators: true }
+        ).select('-password');
+        res.status(200).send(updatedUser);
+    } catch (error) {
+        console.error(error); // Log error for debugging
+        res.status(500).send({ error: "Internal server error" });
+    }
+};
+
+// Controller to view user profile
+exports.viewUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId).select('-password');
+        if (!user) {
+            return res.status(404).send({ error: "User not found" });
+        }
+        res.status(200).send(user);
     } catch (error) {
         console.error(error); // Log error for debugging
         res.status(500).send({ error: "Internal server error" });
