@@ -6,7 +6,7 @@ const path = require('path');
 const userRoute = require("./Routes/userRoute.js");
 const connectDB = require('./db.js');
 
-const port = process.env.PORT || 4040;
+const port = process.env.PORT || 5000;
 
 connectDB();
 const app = express();
